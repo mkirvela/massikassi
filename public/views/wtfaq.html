@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>massikassi - free and anonymous expense sharer</title>
+
+    <meta charset='utf-8'>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
+    <link rel="shortcut icon" href="/img/favicon.png" />
+
+    <!-- Load all custom stylesheets -->
+    <link href="/stylesheets/screen.min.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <!--[if IE]>
+      <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <![endif]-->
+
+    <!-- Load custom fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Rambla' rel='stylesheet' type='text/css'>
+
+    <!-- Load IE support for HTML5 tags -->
+    <!--[if lt IE 9]>
+      <script src="/html5shiv-3.6.2/html5shiv.js"></script>
+      <script src="/html5shiv-3.6.2/html5shiv-printshiv.js"></script>
+    <![endif]-->
+<script>
+</script>
+  </head>
+
+  <body style="padding-top: 70px;"><!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/"><img src="/img/massikassi_invert.jpg" alt="massikassi" style="height: 20px;" /></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/feedback" data-toggle="modal" data-target="#feedback-modal">FEEDBACK</a></li>
+            <li><a href="http://blog.massikassi.com">BLOG</a></li>
+            <li><a href="/wtfaq/">WTFAQ</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="feedback-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Spill the beans! We love feedback.</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="textarea">Feedback</label>
+              <textarea class="form-control" id="feedback" required rows="5" placeholder="Spill the beans!"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" id="feedback_sent" class="btn btn-primary">Send!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+          <h2>WTFAQ</h2>
+
+          <h3>Service</h3>
+
+            Massikassi is a service to easily share expenses, when you want to keep it fair. Like going out, having some drinks, some food and sharing cabs. Or you got a few roomies and occasionally someone has to get more mayo.
+
+          <h3>Logic</h3>
+
+            Massikassi works "against the pot" - meaning that we bundle the expenses of a single event, then calculate how you can resolve the debts easily and with the least amount transactions. Check out our <a href="/examples">examples</a> for details.
+
+          <h3>Precision</h3>
+
+            This is not a banking service. We round up payments to the second decimal (0.01) and it is entirely possible someone might end up paying a few cents more than someone else.
+
+          <h3>Free</h3>
+
+            The basic Massikassi service is free.
+
+          <h3>Why not use...</h3>
+
+            There are other services and you might want to check them out! We couldn't find one that really works for us.
+
+          <h3>The name</h3>
+
+            Massikassi is a way of saying 'moneybag' and can be used to refer to the person that every other sucker owes money to. It's Finnish slang.
+        </div>
+      </div>
+    </div> <!-- /container -->
+
+    <div id="footer">
+      <div class="container">
+        <p class="text-muted" style="margin: 20px 0;">© <%= __("massikassi.com - free and anonymous expense sharer") %></p>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script>
+      $(function() {
+        $("#feedback_sent").click(function() {
+          var feedback = {body: $("#feedback").val()};
+          $.ajax({
+            type: "POST",
+            url: "/feedback",
+            data: feedback
+          });
+          $("#feedback-modal").modal("toggle");
+        });
+      });
+    </script>
+  </body>
+</html>

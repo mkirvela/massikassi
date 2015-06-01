@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>massikassi - free and anonymous expense sharer</title>
+
+	<meta charset='utf-8'>
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
+	<link rel="shortcut icon" href="/img/favicon.png" />
+
+	<!-- Load all custom stylesheets -->
+	<link href="/stylesheets/screen.min.css" media="screen, projection" rel="stylesheet" type="text/css" />
+	<!--[if IE]>
+	  <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+	<![endif]-->
+
+	<!-- Load custom fonts -->
+	<link href='http://fonts.googleapis.com/css?family=Rambla' rel='stylesheet' type='text/css'>
+
+	<!-- Load IE support for HTML5 tags -->
+	<!--[if lt IE 9]>
+	  <script src="/html5shiv-3.6.2/html5shiv.js"></script>
+	  <script src="/html5shiv-3.6.2/html5shiv-printshiv.js"></script>
+	<![endif]-->
+<script>
+</script>
+<style>
+span.step {
+  background: #cccccc;
+  border-radius: 0.8em;
+  -moz-border-radius: 0.8em;
+  -webkit-border-radius: 0.8em;
+  color: #ffffff;
+  display: inline-block;
+  font-weight: bold;
+  font-size: 5em;
+  line-height: 1.6em;
+  margin-right: 5px;
+  text-align: center;
+  width: 1.6em; 
+}
+
+span.step:hover {
+	background: #2a6496;
+	cursor: pointer;
+}
+</style>
+  </head>
+
+  <body style="padding-top: 70px;"><!-- Fixed navbar -->
+	<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	  <div class="container">
+		<div class="navbar-header">
+		  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		  </button>
+		  <a class="navbar-brand" href="/"><img src="/img/massikassi_invert.png" alt="massikassi" style="height: 20px;" /></a>
+		</div>
+		<div class="navbar-collapse collapse">
+		  <ul class="nav navbar-nav navbar-right">
+			<li><a href="/feedback" data-toggle="modal" data-target="#feedback-modal">FEEDBACK</a></li>
+			<li><a href="http://blog.massikassi.com">BLOG</a></li>
+			<li><a href="/wtfaq/">WTFAQ</a></li>
+		  </ul>
+		</div><!--/.nav-collapse -->
+	  </div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="feedback-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h4 class="modal-title" id="myModalLabel">Spill the beans! We love feedback.</h4>
+		  </div>
+		  <div class="modal-body">
+			<div class="form-group">
+			  <label for="textarea">Feedback</label>
+			  <textarea class="form-control" id="feedback" required rows="5" placeholder="Spill the beans!"></textarea>
+			</div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<button type="button" id="feedback_sent" class="btn btn-primary">Send!</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+	<div class="container">
+	  <div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<div class="row">
+				<div class="col-md-4 col-sm-4 text-center"><span class="step">1</span><h4>ADD USERS</h4></div>
+				<div class="col-md-4 col-sm-4 text-center"><span class="step">2</span><h4>SHARE THE LINK</h4></div>
+				<div class="col-md-4 col-sm-4 text-center"><span class="step">3</span><h4>ADD PAYMENTS</h4></div>
+			</div>
+		</div>
+	  </div>
+	</div> <!-- /container -->
+
+	<div id="footer">
+      <div class="container">
+    		<p class="text-muted" style="margin: 20px 0;">© massikassi.com - free and anonymous expense sharer</p>
+      </div>
+    </div>
+
+	<!-- Bootstrap core JavaScript
+	================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<script>
+	  $(function() {
+		$("#feedback_sent").click(function() {
+		  console.log("SENT");
+		  var feedback = {body: $("#feedback").val()};
+		  $.ajax({
+			type: "POST",
+			url: "/feedback",
+			data: feedback
+		  });
+		  $("#feedback-modal").modal("toggle");
+		});
+	  });
+	</script>
+  </body>
+</html>

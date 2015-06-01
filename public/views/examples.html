@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>massikassi - free and anonymous expense sharer</title>
+
+    <meta charset='utf-8'>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
+    <link rel="shortcut icon" href="/img/favicon.png" />
+
+    <!-- Load all custom stylesheets -->
+    <link href="/stylesheets/screen.min.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <!--[if IE]>
+      <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <![endif]-->
+
+    <!-- Load custom fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Rambla' rel='stylesheet' type='text/css'>
+
+    <!-- Load IE support for HTML5 tags -->
+    <!--[if lt IE 9]>
+      <script src="/html5shiv-3.6.2/html5shiv.js"></script>
+      <script src="/html5shiv-3.6.2/html5shiv-printshiv.js"></script>
+    <![endif]-->
+<script>
+</script>
+  </head>
+
+  <body style="padding-top: 70px;"><!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/"><img src="/img/massikassi_invert.png" alt="massikassi" style="height: 20px;" /></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/feedback" data-toggle="modal" data-target="#feedback-modal">FEEDBACK</a></li>
+            <li><a href="http://blog.massikassi.com">BLOG</a></li>
+            <li><a href="/wtfaq/">WTFAQ</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="feedback-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Spill the beans! We love feedback.</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="textarea">Feedback</label>
+              <textarea class="form-control" id="feedback" required rows="5" placeholder="Spill the beans!"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" id="feedback_sent" class="btn btn-primary">Send!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <h2>Examples</h2>
+          <h3>Payment 1</h3>
+          <p>Urz the Impatient quickly grew tired of the haggling, up-ending the pouch with all the electrum coins on the ironwood desk of the merchant, who skillfully hid her mirth behind her silken scarf. <em>&quot;May your bones soon pale under the three suns&quot;</em>, he spat, and stomped away with a box containing three live compass beetles. He regretted the cost already, but the beetles would be sorely needed to cross the Mirror Plains. Surely the others will agree?</p>
+          <img src="/img/example1.png" style="width: 50%;" />
+          <p>A box of compass beetles $105 - Urz the Impatient +70, Twirlduck -35, Baron Samedi -35</p>
+          <h3>Payment 2</h3>
+          <p>Twirlduck was miserable, being painfully aware now that playing skull dice against the sisters of the Quantum Order is a folly - especially after smoking some dried toad poo with the locals. Last night it had all seemed like a thing to do. Having lost all of her cash, she was now forced to borrow some from the Baron, who - the indignation! - would not take a word of an honest duck, but required a proper beak mark into some incomprehensible parchment. Now she had a horrible hangover AND some ink on her beak.</p>
+          <img src="/img/example2.png" style="width: 50%;" />
+          <p>A personal loan of $48 - Baron Samedi +48, Twirlduck -48.</p>
+          <h3>Payment 3</h3>
+          <p>Baron Samedi again had challenges to perceive which world-thread exactly its consciousness was inhabiting, mainly because it was just too damn bored to pay attention. The one where the sentient viruses had enslaved the mankind? The one with the robotic tyrant pope? Nope, neither of those have ice cream and look, here's a barrow advertising just that! Must be the one where that silly duck princess just traded her soul to a handful of coins. Oh well, could as well get some ice cream for everyone...</p>
+          <img src="/img/example3.png" style="width: 50%;" />
+          <p>Ice cream $6 - Baron Samedi +4, Twirlduck -2, Urz the Impatient -2</p>
+        </div>
+      </div>
+    </div> <!-- /container -->
+
+    <div id="footer" style="background-color: #063642; padding: 50px; margin-top: 50px;">
+      <div class="container text-center">
+        <img src="/img/massikassi_alpha.png" />
+        <p class="text-muted" style="margin: 20px 0;">© <%= __("massikassi.com - free and anonymous expense sharer") %></p>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script>
+      $(function() {
+        $("#feedback_sent").click(function() {
+          var feedback = {body: $("#feedback").val()};
+          $.ajax({
+            type: "POST",
+            url: "/feedback",
+            data: feedback
+          });
+          $("#feedback-modal").modal("toggle");
+        });
+      });
+    </script>
+  </body>
+</html>
