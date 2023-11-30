@@ -1,0 +1,12 @@
+services:
+  massikassi-db:
+    container_name: massikassi-dev
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: local-env-password
+      TZ: "Europe/Helsinki"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./scripts:/docker-entrypoint-initdb.d/

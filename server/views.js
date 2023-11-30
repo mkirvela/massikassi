@@ -1,6 +1,7 @@
 var _ = require('underscore');
 var db = require('./db');
 var i18n = require("i18n");
+const { check, validationResult } = require("express-validator");
 
 function getRoot(req, res) {
     res.render("landing.html", { errors: {} });
@@ -12,18 +13,21 @@ function postRoot(req, res) {
         res.render("landing.html", { errors: {} });
         return;
     }
-    req.assert("name", "Name is required").notEmpty();
-    req.assert("user", "A first user must be provided").notEmpty();
+    //req.assert("name", "Name is required").notEmpty();
+    check("name", "Name is required").not().isEmpty();
+    //req.assert("user", "A first user must be provided").notEmpty();
+    check("user", "A first user must be provided").not().isEmpty();
     if (req.body.email) {
         req.assert("email", "A valid email must be provided").isEmail();
     }
-    var errors = req.validationErrors(true);
-    if (errors) {
+    var errors = validationResult(req);
+    if (!errors.isEmpty()) {
         res.render("landing", { errors: errors });
     } else {
         db.addEvent(req.body, function(err, hash) {
-            var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
-            var body =
+            if (process.env.SENDGRID_USERNAME) {
+                var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+                var body =
 "Hello! " +
 "\n\n" +
 "You have been invited to share expenses for the event: " + req.body.name +
@@ -34,16 +38,17 @@ function postRoot(req, res) {
 "simple. If you have problems using our service, let us know what we have done wrong." +
 "\n\n" +
 "Read more about us at: www.massikassi.com \n \n Cheers, \n Massikassi-team";
-            sendgrid.send({
-                to: req.body.email,
-                from: "massikassi@massikassi.com",
-                subject: "Your massikassi event #" + hash,
-                text: body
-            }, function(err, json) {
-                if (err) { 
-                    return console.error(err);
-                }
-            });
+                sendgrid.send({
+                    to: req.body.email,
+                    from: "massikassi@massikassi.com",
+                    subject: "Your massikassi event #" + hash,
+                    text: body
+                }, function(err, json) {
+                    if (err) { 
+                        return console.error(err);
+                    }
+                });
+            }
             res.redirect("/event/" + hash);
         });
     }
@@ -52,7 +57,7 @@ function postRoot(req, res) {
 function getEvent(req, res) {
     db.getEvent(req.params.hash, function(err, result) {
         if (err) {
-            res.send(500);
+            res.sendStatus(500);
             return;
         }
         if (_.isEmpty(result)) {
@@ -65,7 +70,7 @@ function getEvent(req, res) {
 
 function getUsersForEvent(req, res) {
     if (!req.query.hash) {
-        res.send(500, "Mandatory parameters missing");
+        res.send(500, "iMandatory parameters missing");
         return;
     }
     db.getUsersForEvent(req.query.hash, function(err, result) {
@@ -158,6 +163,10 @@ function getEventInfo(req, res) {
         return;
     }
     db.getEventInfo(req.query.hash, function(err, result) {
+        if (result == null) {
+            res.status(404).json({success: false, msg: "no such event found"});
+            return;
+        }
         result.payments = _.chain(result.payments)
             .flatten()
             .groupBy(function(payment) {

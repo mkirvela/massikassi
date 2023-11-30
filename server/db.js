@@ -3,8 +3,27 @@ var _ = require('underscore');
 
 var connectionString = process.env.DATABASE_URL || "postgres://localhost:5432/massikassi";
 
+/*
+var pgClient = new pg.Client({
+  user: 'postgres',
+  host: 'localhost',
+  password: 'local-env-password',
+  database: 'massikassi',
+  port: 5432
+});
+*/
+
+var pgClient = new pg.Pool({
+  user: 'postgres',
+  host: 'localhost',
+  password: 'local-env-password',
+  database: 'massikassi',
+  port: 5432
+});
+
 exports.addEvent = function(payload, callback) {
-    pg.connect(connectionString, function(err, client, done) {
+    //pg.connect(connectionString, function(err, client, done) {
+    pgClient.connect(function(err, client, done) {
         function generateAndCheckHash(callback) {
             var hash = Math.random().toString(36).substr(9);
             client.query("SELECT name FROM api_event WHERE hash = $1", [hash], function(err, result) {
@@ -17,14 +36,12 @@ exports.addEvent = function(payload, callback) {
         }
 
         generateAndCheckHash(function(hash) {
-            client.query("INSERT INTO api_event (name, hash, created, created_by) VALUES ($1, $2, $3, $4) RETURNING id",
-                [payload.name, hash, new Date(), payload.user],
-                function(err, result) {
+            client.query("INSERT INTO api_event (name, hash, created, created_by) VALUES ($1, $2, $3, $4) RETURNING id", [payload.name, hash, new Date(), payload.user], function(err, result) {
                     // TODO: handle possible error somehow
                     client.query("INSERT INTO api_user (event_id, name, email) VALUES ($1, $2, $3)",
                         [result.rows[0].id, payload.user, payload.email],
                         function(err) {
-                            done();
+                            //done();
                             callback(err, hash);
                         });
                 });
@@ -33,13 +50,14 @@ exports.addEvent = function(payload, callback) {
 };
 
 exports.getEvent = function(hash, callback) {
-    pg.connect(connectionString, function(err, client, done) {
+    //pg.connect(connectionString, function(err, client, done) {
+    pgClient.connect(function(err, client, done) {
         if (err) {
             return callback(err);
         }
         client.query("SELECT * FROM api_event WHERE hash = $1", [hash], function(err, result) {
             // TODO: handle possible errors
-            done();
+            //done();
             if (err) callback(err, null);
             if (result.rowCount === 1) {
                 callback(err, result.rows[0]);
@@ -51,10 +69,11 @@ exports.getEvent = function(hash, callback) {
 };
 
 exports.getUsersForEvent = function(hash, callback) {
-    pg.connect(connectionString, function(err, client, done) {
+    //pg.connect(connectionString, function(err, client, done) {
+    pgClient.connect(function(err, client, done) {
         client.query("SELECT api_user.id, api_user.name FROM api_user, api_event " +
             "WHERE api_user.event_id = api_event.id AND api_event.hash = $1;", [hash], function(err, result) {
-            done();
+            //done();
             if (err) callback(err, null);
             if (result.rowCount > 0) {
                 callback(err, result.rows);
@@ -66,7 +85,8 @@ exports.getUsersForEvent = function(hash, callback) {
 };
 
 exports.addUserToEvent = function(hash, payload, callback) {
-    pg.connect(connectionString, function(err, client, done) {
+    //pg.connect(connectionString, function(err, client, done) {
+    pgClient.connect(function(err, client, done) {
         client.query("SELECT * FROM api_event WHERE hash = $1", [hash], function(err, result) {
             if (err) callback(err, null);
             if (result.rowCount === 1) {
@@ -74,12 +94,12 @@ exports.addUserToEvent = function(hash, payload, callback) {
                 client.query("SELECT * FROM api_user WHERE name = $1 AND event_id = $2", [payload.name, event_id], function(err, result) {
                     if (err) callback(err, null);
                     if (result.rowCount > 0) {
-                        done();
+                        //done();
                         callback(null, null);
                         return;
                     } else {
                         client.query("INSERT INTO api_user (event_id, name) VALUES ($1, $2) RETURNING id", [event_id, payload.name], function(err, result) {
-                            done();
+                            //done();
                             if (err) { return callback(err, null); }
                             var user = { id: result.rows[0].id, name: payload.name };
                             callback(err, user);
@@ -94,13 +114,14 @@ exports.addUserToEvent = function(hash, payload, callback) {
 };
 
 exports.editEventName = function(hash, payload, callback) {
-    pg.connect(connectionString, function(err, client, done) {
+    //pg.connect(connectionString, function(err, client, done) {
+    pgCclient.connect(function(err, client, done) {
         client.query("SELECT * FROM api_event WHERE hash = $1", [hash], function(err, result) {
             if (err) callback(err, null);
             if (result.rowCount === 1) {
                 var event_id = result.rows[0].id;
                 client.query("UPDATE api_event SET name = $1 WHERE id = $2 returning name", [payload.name, event_id], function(err, result) {
-                    done();
+                    //done();
                     callback(err, result.rows[0]);
                 });
             }
@@ -174,7 +195,7 @@ function dividePayment(payment) {
 exports.dividePayment = dividePayment;
 
 exports.addPayment = function(hash, payload, edit, callback) {
-    pg.connect(connectionString, function(err, client, done) {
+    pgClient.connect(function(err, client, done) {
         client.query("SELECT * FROM api_event WHERE hash = $1", [hash], function(err, result) {
             if (err) callback(err, null);
             if (result.rowCount === 1) {
@@ -208,7 +229,7 @@ exports.addPayment = function(hash, payload, edit, callback) {
                     //client.query("SELECT api_payment.description, api_payment.amount, api_payment.payer, api_payment.created, " +
                     //     "FROM api_payment, api_due WHERE api_due.payment_id = api_payment.id AND api_payment.id = $1;", [payment_id],
                         function(err, result) {
-                            done();
+                            //done();
                             // TODO: error handling
                             // TODO: created field is bollocks!
                             var resultJson = { description: description,
@@ -223,7 +244,7 @@ exports.addPayment = function(hash, payload, edit, callback) {
                             resultJson.sharers = dues;
                             if (edit) {
                                 client.query("UPDATE api_payment SET deleted = true WHERE id = $1", [payload.original], function(err, result) {
-                                    done();
+                                    //done();
                                     callback(null, resultJson);
                                 });
                             } else {
@@ -237,9 +258,12 @@ exports.addPayment = function(hash, payload, edit, callback) {
 };
 
 exports.getEventInfo = function(hash, callback) {
-    pg.connect(connectionString, function(err, client, done) {
+    //pg.connect(connectionString, function(err, client, done) {
+    pgClient.connect(function(err, client, done) {
         client.query("SELECT * FROM api_event WHERE hash = $1", [hash], function(err, result) {
-            if (err) callback(err, null);
+            if (err) {
+                callback(err, null);
+            }
             if (result.rowCount === 1) {
                 var eventName = result.rows[0].name;
                 var createdBy = result.rows[0].created_by;
@@ -253,7 +277,7 @@ exports.getEventInfo = function(hash, callback) {
                              "JOIN api_due ON api_due.payment_id = api_payment.id " +
                              "JOIN api_user ON api_user.id = api_due.user_id " +
                              "WHERE api_event.id = $1 ORDER BY api_payment.created DESC;", [eventId], function(err, result) {
-                        done();
+                        //done();
                         var eventInfo = {};
                         eventInfo.name = eventName;
                         eventInfo.createdBy = createdBy;
@@ -261,22 +285,25 @@ exports.getEventInfo = function(hash, callback) {
                         eventInfo.payments = result.rows;
                         callback(err, eventInfo);
                     });
+            } else {
+                callback(err, null);
             }
         });
     });
 };
 
 exports.deletePayment = function(hash, payload, callback) {
-    pg.connect(connectionString, function(err, client, done) {
+    //pg.connect(connectionString, function(err, client, done) {
+    pgClient.connect(function(err, client, done) {
         client.query("SELECT api_event.id FROM api_event, api_payment WHERE api_event.hash = $1 AND api_payment.id = $2 AND api_payment.event_id = api_event.id;", [hash, payload.id], function(err, result) {
             if (err) {
-                done();
+                //done();
                 callback(err, null);
                 return;
             }
             if (result.rowCount === 1) {
                 client.query("DELETE FROM api_payment WHERE id = $1", [payload.id], function(err, result) {
-                    done();
+                    //done();
                     callback(err, result);
                 });
             }

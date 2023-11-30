@@ -4,7 +4,14 @@ var client;
 var api_due, api_event, api_payment, api_user;
 
 
-client = new pg.Client(connectionString);
+//client = new pg.Client(connectionString);
+client = new pg.Client({
+  user: 'postgres',
+  host: 'localhost',
+  password: 'localenvpassword',
+  database: 'massikassi',
+  port: 5432
+});
 
 client.connect(function(err) {
     if (err) {

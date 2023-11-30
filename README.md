@@ -8,15 +8,13 @@ Running at http://www.massikassi.com/
 
 ### Prerequisites
 
-* postgres, npm, grunt-cli and bower installed.
+* docker
+* use asdf to install node
 
 ### Installation
 
 * Clone repository, `git clone git@github.com:mkirvela/massikassi.git`
-* Create DB for massikassi `createdb -E UTF-8 massikassi`
+In `db`-folder run `docker compose up -d`
 * run `npm install`
-* run `bower install`
-* run `node db/schema.js`
-* run `grunt watch` in a separate console
 * run `node server` in a console
 * Go to http://localhost:3000/

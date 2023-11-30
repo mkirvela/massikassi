@@ -3,6 +3,10 @@ var cons = require('consolidate');
 var clientSessions = require('client-sessions');
 var expressValidator = require('express-validator');
 var i18n = require("i18n");
+var compression = require('compression');
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+var morgan = require('morgan');
 
 var views = require('./views');
 
@@ -17,13 +21,15 @@ module.exports = function(secret, viewspath, staticpath) {
     });
 
     var app = express();
-    app.configure(function() {
-        app.use(expressValidator());
-        app.use(express.compress());
-        app.use(express.bodyParser());
-        app.use(express.methodOverride());
-        app.use(express.logger("dev"));  // log every request to the console
-        app.use(express.json());       // to support JSON-encoded bodies
+    //app.configure(function() {
+        //app.use(expressValidator());
+        app.use(compression());
+        //app.use(bodyParser());
+        app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(bodyParser.json());
+        app.use(methodOverride());
+        app.use(morgan("dev"));    // log every request to the console
+        //app.use(express.json()); // to support JSON-encoded bodies
         app.use(clientSessions({
             cookieName: 'session',
             secret: secret
@@ -37,7 +43,7 @@ module.exports = function(secret, viewspath, staticpath) {
         // Default engine HTML, set template path
         app.set('view engine', 'html');
         app.set('views', viewspath);
-    });
+    //});
 
     views.setup(app);
 
