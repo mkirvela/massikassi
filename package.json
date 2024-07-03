@@ -21,7 +21,7 @@
     "express": "3.2.5",
     "client-sessions": "0.6.0",
     "consolidate": "0.10.0",
-    "pg": "7.9",
+    "pg": "7.9.0",
     "i18n": "0.4.1",
     "express-validator": "2.1.1",
     "underscore": "1.4.4",
